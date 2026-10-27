@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, Image, Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Stack, useLocalSearchParams } from 'expo-router';
-import type { CoverType, Market, Stall } from '@flohmarkt/shared';
+import type { CoverType, Market, MarketDate, Stall } from '@flohmarkt/shared';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../lib/auth';
 import { FavoriteButton } from '../../components/FavoriteButton';
@@ -12,6 +12,7 @@ export default function MarketDetailScreen() {
   const { profile } = useAuth();
   const [market, setMarket] = useState<Market | null>(null);
   const [stalls, setStalls] = useState<Stall[]>([]);
+  const [dates, setDates] = useState<MarketDate[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -25,9 +26,11 @@ export default function MarketDetailScreen() {
         .eq('approval_status', 'approved')
         .or(`event_date.is.null,event_date.gte.${todayIso()}`)
         .order('stand_number'),
-    ]).then(([m, s]) => {
+      supabase.from('market_dates').select('*').eq('market_id', id).gte('event_date', todayIso()).order('event_date').limit(12),
+    ]).then(([m, s, d]) => {
       setMarket((m.data as Market | null) ?? null);
       setStalls((s.data ?? []) as Stall[]);
+      setDates((d.data ?? []) as MarketDate[]);
       setLoading(false);
     });
   }, [id]);
@@ -58,7 +61,30 @@ export default function MarketDetailScreen() {
         </ScrollView>
       )}
 
+      {!!market.address && <Info label="Adresse" value={market.address} />}
       {!!market.description && <Text style={styles.text}>{market.description}</Text>}
+
+      {dates.length > 0 && (
+        <View style={styles.info}>
+          <Text style={styles.infoLabel}>Nächste Termine</Text>
+          {dates.map((d) => {
+            const start = formatTime(d.start_time);
+            const end = formatTime(d.end_time);
+            return (
+              <Text key={d.id} style={styles.text}>
+                {new Date(`${d.event_date}T12:00:00`).toLocaleDateString('de-DE', { weekday: 'short', day: 'numeric', month: 'long' })}
+                {start ? `, ${start}${end ? `–${end}` : ''} Uhr` : ''}
+                {d.note ? ` · ${d.note}` : ''}
+              </Text>
+            );
+          })}
+        </View>
+      )}
+      {!!market.website_url && (
+        <Pressable onPress={() => Linking.openURL(market.website_url!)}>
+          <Text style={styles.link}>Mehr Infos und Quelle ↗</Text>
+        </Pressable>
+      )}
       {market.is_covered && <Info label="Überdachung" value={COVER_LABELS[market.is_covered as CoverType]} />}
       {!!market.features?.length && <Info label="Ausstattung" value={market.features.join(', ')} />}
       {!!market.parking_info_text && <Info label="Parken" value={market.parking_info_text} />}
@@ -118,6 +144,7 @@ const styles = StyleSheet.create({
   text: { fontSize: 15, color: COLORS.text, marginTop: 4 },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
   info: { marginTop: 12 },
+  link: { color: COLORS.primary, fontWeight: '600', marginTop: 12 },
   infoLabel: { fontSize: 13, fontWeight: '600', color: COLORS.muted },
   section: { fontSize: 17, fontWeight: '600', marginTop: 24, marginBottom: 8, color: COLORS.text },
   stall: { flexDirection: 'row', paddingVertical: 12, borderTopWidth: 1, borderTopColor: COLORS.border },

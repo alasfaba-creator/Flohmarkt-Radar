@@ -29,7 +29,8 @@ Navigation mit Expo Router, Screens liegen in `apps/mobile/src/app`:
 
 | Screen | Datei | Login |
 | --- | --- | --- |
-| Karte mit Umkreis- und Kategorienfilter | `index.tsx` | nein |
+| Liste „wann – wo – was“ (Startseite) | `(tabs)/index.tsx` | nein |
+| Karte mit denselben Filtern (Tag, Umkreis, Kategorie) | `(tabs)/karte.tsx` | nein |
 | Marktdetails mit Ständen | `market/[id].tsx` | nein |
 | Anmelden / Registrieren (Drei-Punkt-Menü) | `login.tsx` | – |
 | Stand eintragen | `stall/new.tsx` | Anbieter |
@@ -48,6 +49,8 @@ Supabase-Projekt `flohmarkt-radar` (Region Frankfurt). Die Migrationen in `supab
 - **Veranstalter** starten mit `organizer_status = 'pending'` und dürfen erst nach Freigabe durch einen Super-Admin Märkte anlegen.
 - **Garagen-/Hofverkäufe** landen automatisch auf `pending_approval` und sind erst nach Freigabe öffentlich sichtbar.
 - **`location`** wird aus `latitude`/`longitude` automatisch befüllt.
+- **Termine:** `market_dates` (ein Markt, viele Termine). Kalender lädt über `supabase.rpc('market_dates_nearby', { lat, lng, radius_m, from_date, to_date })`.
+- **Testdaten:** Märkte rund um Wuppertal aus Online-Portalen, nur zum Testen (Quelle steht in `website_url` und `market_dates.source_url`). Vor einer Veröffentlichung löschen: `delete from markets where description like 'Testdaten%';`
 - **Umkreissuche:** `supabase.rpc('markets_nearby', { lat, lng, radius_m })` und `stalls_nearby`.
 - **Speicher:** `proof-images` (privat, nur Eigentümer und Admin), `market-images` und `stall-images` (öffentlich). Dateien liegen unter `<user_id>/<dateiname>`.
 - **Super-Admin** setzen (im Supabase SQL-Editor): `update profiles set is_super_admin = true where email = '...';`
