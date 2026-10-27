@@ -1,22 +1,21 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import MapView, { Circle, Marker } from 'react-native-maps';
-import * as Location from 'expo-location';
 import { router } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import type { NearbyMarket, NearbyStall } from '@flohmarkt/shared';
-import { useNearby } from '../lib/useNearby';
-import { Chip } from '../components/Chip';
-import { FavoriteButton } from '../components/FavoriteButton';
+import { useNearby } from '../../lib/useNearby';
+import { useUserLocation } from '../../lib/useUserLocation';
+import { Chip } from '../../components/Chip';
+import { FavoriteButton } from '../../components/FavoriteButton';
 import {
   CATEGORIES,
   COLORS,
-  FALLBACK_REGION,
   RADIUS_OPTIONS_KM,
   STALL_TYPE_LABELS,
   formatDistance,
   formatTime,
-} from '../lib/constants';
+} from '../../lib/constants';
 
 type Selection = { kind: 'market'; item: NearbyMarket } | { kind: 'stall'; item: NearbyStall } | null;
 
@@ -24,28 +23,11 @@ type Selection = { kind: 'market'; item: NearbyMarket } | { kind: 'stall'; item:
 export default function MarketMapScreen() {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);
-  const [center, setCenter] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [locationDenied, setLocationDenied] = useState(false);
+  const { location: center, denied: locationDenied } = useUserLocation();
   const [radiusKm, setRadiusKm] = useState<number>(10);
   const [category, setCategory] = useState<string | null>(null);
   const [selection, setSelection] = useState<Selection>(null);
   const { markets, stalls, loading, error } = useNearby(center, radiusKm);
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        setLocationDenied(true);
-        setCenter(FALLBACK_REGION);
-        return;
-      }
-      const pos = await Location.getCurrentPositionAsync({ accuracy: Location.Accuracy.Balanced });
-      setCenter({ latitude: pos.coords.latitude, longitude: pos.coords.longitude });
-    })().catch(() => {
-      setLocationDenied(true);
-      setCenter(FALLBACK_REGION);
-    });
-  }, []);
 
   // Zoom an den Umkreis anpassen.
   useEffect(() => {

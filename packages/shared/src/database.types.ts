@@ -39,6 +39,47 @@ export type Database = {
         }
         Relationships: []
       }
+      market_dates: {
+        Row: {
+          created_at: string
+          end_time: string | null
+          event_date: string
+          id: string
+          market_id: string
+          note: string | null
+          source_url: string | null
+          start_time: string | null
+        }
+        Insert: {
+          created_at?: string
+          end_time?: string | null
+          event_date: string
+          id?: string
+          market_id: string
+          note?: string | null
+          source_url?: string | null
+          start_time?: string | null
+        }
+        Update: {
+          created_at?: string
+          end_time?: string | null
+          event_date?: string
+          id?: string
+          market_id?: string
+          note?: string | null
+          source_url?: string | null
+          start_time?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "market_dates_market_id_fkey"
+            columns: ["market_id"]
+            isOneToOne: false
+            referencedRelation: "markets"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       market_suggestions: {
         Row: {
           created_at: string
@@ -76,6 +117,7 @@ export type Database = {
       }
       markets: {
         Row: {
+          address: string | null
           available_sizes_text: string | null
           booked_stalls: number | null
           created_at: string
@@ -95,8 +137,10 @@ export type Database = {
           show_free_stalls_to_sellers: boolean | null
           show_occupancy_to_sellers: boolean | null
           total_stalls: number | null
+          website_url: string | null
         }
         Insert: {
+          address?: string | null
           available_sizes_text?: string | null
           booked_stalls?: number | null
           created_at?: string
@@ -116,8 +160,10 @@ export type Database = {
           show_free_stalls_to_sellers?: boolean | null
           show_occupancy_to_sellers?: boolean | null
           total_stalls?: number | null
+          website_url?: string | null
         }
         Update: {
+          address?: string | null
           available_sizes_text?: string | null
           booked_stalls?: number | null
           created_at?: string
@@ -137,6 +183,7 @@ export type Database = {
           show_free_stalls_to_sellers?: boolean | null
           show_occupancy_to_sellers?: boolean | null
           total_stalls?: number | null
+          website_url?: string | null
         }
         Relationships: [
           {
@@ -261,6 +308,20 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      market_dates_nearby: {
+        Args: {
+          from_date: string
+          lat: number
+          lng: number
+          radius_m: number
+          to_date: string
+        }
+        Returns: {
+          distance_m: number
+          market: Database["public"]["Tables"]["markets"]["Row"]
+          market_date: Database["public"]["Tables"]["market_dates"]["Row"]
+        }[]
+      }
       markets_nearby: {
         Args: { lat: number; lng: number; radius_m: number }
         Returns: {

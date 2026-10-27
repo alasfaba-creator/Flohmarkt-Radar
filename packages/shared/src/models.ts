@@ -30,3 +30,6 @@ export type MarketSuggestion = Tables<'market_suggestions'>;
 
 export type NearbyMarket = { market: Market; distance_m: number };
 export type NearbyStall = { stall: Stall; distance_m: number };
+
+export type MarketDate = Tables<'market_dates'>;
+export type NearbyMarketDate = { market_date: MarketDate; market: Market; distance_m: number };
