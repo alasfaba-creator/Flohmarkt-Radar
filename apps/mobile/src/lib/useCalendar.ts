@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import type { CoverType, NearbyMarketDate, NearbyStall, StallType } from '@flohmarkt/shared';
 import { supabase } from './supabase';
 import { toDbDate } from './time';
+import { FEATURE_CATEGORIES } from './constants';
 
 export type CalendarEntry = {
   key: string;
@@ -51,7 +52,7 @@ export function useCalendar(center: Center | null, radiusKm: number) {
       return;
     }
 
-    // Kategorien eines Markts ergeben sich aus den freigegebenen Ständen, die dort eingetragen sind.
+    // Kategorien eines Markts ergeben sich aus seiner Marktart und den freigegebenen Ständen, die dort eingetragen sind.
     const allStalls = (stalls.data ?? []) as NearbyStall[];
     const marketCategories = new Map<string, Set<string>>();
     for (const { stall } of allStalls) {
@@ -74,7 +75,12 @@ export function useCalendar(center: Center | null, radiusKm: number) {
       covered: market.is_covered as CoverType | null,
       latitude: market.latitude,
       longitude: market.longitude,
-      categories: [...(marketCategories.get(market.id) ?? [])],
+      categories: [
+        ...new Set([
+          ...(marketCategories.get(market.id) ?? []),
+          ...(market.features ?? []).flatMap((f) => FEATURE_CATEGORIES[f] ?? []),
+        ]),
+      ],
     }));
 
     const stallEntries: CalendarEntry[] = allStalls

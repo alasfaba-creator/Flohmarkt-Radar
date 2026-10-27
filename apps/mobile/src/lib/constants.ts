@@ -28,6 +28,16 @@ export const CATEGORIES = [
   'Schmuck',
 ] as const;
 
+// Marktarten aus den Termin-Quellen (markets.features) passend zu unseren Kategorien.
+export const FEATURE_CATEGORIES: Record<string, string[]> = {
+  'Second Hand & Modemarkt': ['Kleidung'],
+  'Second-Hand & Lifestylemarkt': ['Kleidung'],
+  'Bambini, Kinder & Jugend': ['Kinderkleidung', 'Spielzeug & Spiele'],
+  'Antik-Trödelmarkt': ['Antiquitäten'],
+  'Antik- Sammlermarkt': ['Antiquitäten'],
+  'Trödelhallen, Antikläden, Lagerverkauf': ['Antiquitäten', 'Möbel'],
+};
+
 export const RADIUS_OPTIONS_KM = [2, 5, 10, 25, 50] as const;
 
 export const STALL_TYPE_LABELS: Record<StallType, string> = {
