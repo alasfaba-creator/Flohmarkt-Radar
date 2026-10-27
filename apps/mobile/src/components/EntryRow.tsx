@@ -16,7 +16,6 @@ export function EntryRow({ entry, showDate, onPress }: { entry: CalendarEntry; s
   const details = [
     showDate ? formatShortDay(entry.date) : null,
     entryTime(entry),
-    formatDistance(entry.distanceM),
     entry.covered ? COVER_LABELS[entry.covered] : null,
   ].filter(Boolean);
 
@@ -31,7 +30,10 @@ export function EntryRow({ entry, showDate, onPress }: { entry: CalendarEntry; s
         {!!entry.address && <Text style={styles.address}>{entry.address}</Text>}
         <Text style={styles.muted}>{details.join(' · ')}</Text>
       </View>
-      <FavoriteButton type={entry.kind} id={entry.id} />
+      <View style={styles.side}>
+        <Text style={styles.distance}>{formatDistance(entry.distanceM)}</Text>
+        <FavoriteButton type={entry.kind} id={entry.id} />
+      </View>
     </Pressable>
   );
 }
@@ -52,5 +54,7 @@ const styles = StyleSheet.create({
   badgeStall: { backgroundColor: COLORS.primary },
   title: { fontSize: 16, fontWeight: '600', color: COLORS.text },
   address: { fontSize: 14, color: COLORS.text, marginTop: 2 },
+  side: { alignItems: 'flex-end', justifyContent: 'space-between', alignSelf: 'stretch' },
+  distance: { fontSize: 15, fontWeight: '700', color: COLORS.primary },
   muted: { fontSize: 13, color: COLORS.muted, marginTop: 2 },
 });
