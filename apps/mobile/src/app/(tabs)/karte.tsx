@@ -8,7 +8,7 @@ import { FilterBar } from '../../components/FilterBar';
 import { EntryRow } from '../../components/EntryRow';
 import { COLORS } from '../../lib/constants';
 
-// Karte mit denselben Filtern wie die Liste. Zeigt die Märkte des gewählten Tags.
+// Karte mit denselben Filtern wie die Liste. Ohne gewählten Tag zeigt jeder Pin den nächsten Termin.
 export default function MapScreen() {
   const insets = useSafeAreaInsets();
   const mapRef = useRef<MapView>(null);

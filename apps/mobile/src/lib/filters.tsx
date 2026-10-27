@@ -3,10 +3,15 @@ import { useUserLocation } from './useUserLocation';
 import { useCalendar, type CalendarEntry } from './useCalendar';
 
 type Coords = { latitude: number; longitude: number };
+export type Place = Coords & { label: string };
 
 type FiltersState = {
+  /** Mittelpunkt der Suche: eingetippter Ort oder GPS-Standort. */
   location: Coords | null;
   locationDenied: boolean;
+  /** Eingetippter Ort; null = aktueller GPS-Standort. */
+  place: Place | null;
+  setPlace: (place: Place | null) => void;
   radiusKm: number;
   setRadiusKm: (km: number) => void;
   category: string | null;
@@ -26,7 +31,9 @@ const FiltersContext = createContext<FiltersState | null>(null);
 
 // Gemeinsame Filter für Liste und Karte: ein Tag, Umkreis oder Kategorie ändert beide Ansichten.
 export function FiltersProvider({ children }: { children: ReactNode }) {
-  const { location, denied } = useUserLocation();
+  const { location: gps, denied } = useUserLocation();
+  const [place, setPlace] = useState<Place | null>(null);
+  const location = place ?? gps;
   const [radiusKm, setRadiusKm] = useState(25);
   const [category, setCategory] = useState<string | null>(null);
   const [selectedDay, setSelectedDay] = useState<string | null>(null);
@@ -37,11 +44,9 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     [all, category],
   );
   const eventDays = useMemo(() => [...new Set(byCategory.map((e) => e.date))], [byCategory]);
-  // Es ist immer ein Tag gewählt: anfangs der nächste Tag mit Flohmarkt, und wenn der gewählte Tag
-  // durch einen anderen Filter wegfällt, ebenfalls der nächste verfügbare.
+  // Fällt der gewählte Tag durch einen anderen Filter weg, wieder alle kommenden Termine zeigen.
   useEffect(() => {
-    if (loading) return;
-    if (!selectedDay || !eventDays.includes(selectedDay)) setSelectedDay(eventDays[0] ?? null);
+    if (selectedDay && !loading && !eventDays.includes(selectedDay)) setSelectedDay(null);
   }, [eventDays, selectedDay, loading]);
 
   const entries = useMemo(
@@ -51,7 +56,9 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
 
   const value: FiltersState = {
     location,
-    locationDenied: denied,
+    locationDenied: denied && !place,
+    place,
+    setPlace,
     radiusKm,
     setRadiusKm,
     category,

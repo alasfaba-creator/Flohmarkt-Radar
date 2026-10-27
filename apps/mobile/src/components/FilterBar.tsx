@@ -4,8 +4,10 @@ import { useFilters } from '../lib/filters';
 import { CATEGORIES, COLORS, RADIUS_OPTIONS_KM } from '../lib/constants';
 import { MONTHS_SHORT, WEEKDAYS_SHORT, formatDayHeading, parseDbDate } from '../lib/dates';
 import { Chip } from './Chip';
+import { PlacePicker } from './PlacePicker';
 
-// Umkreis, Kategorie-Button und Tagesleiste (nur Tage mit Flohmarkt). Liegt über Liste und Karte.
+// Ort, Umkreis, Kategorie-Button und Tagesleiste (nur Tage mit Flohmarkt). Ohne gewählten Tag sind alle kommenden
+// Termine zu sehen, ein zweiter Tipp auf den gewählten Tag hebt die Auswahl auf. Liegt über Liste und Karte.
 export function FilterBar() {
   const {
     radiusKm,
@@ -23,6 +25,7 @@ export function FilterBar() {
   return (
     <View style={styles.bar}>
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.row}>
+        <PlacePicker />
         <Pressable
           style={[styles.categoryButton, category && styles.categoryActive]}
           onPress={() => setCategoryOpen(true)}
@@ -45,7 +48,7 @@ export function FilterBar() {
             <Pressable
               key={iso}
               style={[styles.day, selected && styles.daySelected]}
-              onPress={() => setSelectedDay(iso)}
+              onPress={() => setSelectedDay(selected ? null : iso)}
               accessibilityLabel={formatDayHeading(iso)}
             >
               <Text style={[styles.weekday, selected && styles.selectedText]}>{WEEKDAYS_SHORT[d.getDay()]}</Text>
@@ -56,7 +59,7 @@ export function FilterBar() {
         })}
       </ScrollView>
 
-      {locationDenied && <Text style={styles.notice}>Ohne Standortfreigabe zeigen wir Termine rund um die Mitte Deutschlands.</Text>}
+      {locationDenied && <Text style={styles.notice}>Ohne Standortfreigabe zeigen wir Termine rund um die Mitte Deutschlands. Tippe auf 📍, um einen Ort einzugeben.</Text>}
       {error && <Text style={[styles.notice, styles.error]}>{error}</Text>}
 
       <Modal visible={categoryOpen} transparent animationType="slide" onRequestClose={() => setCategoryOpen(false)}>
