@@ -23,6 +23,21 @@ npm run web      # Webportal auf http://localhost:5173
 npm run typecheck
 ```
 
+## Mobil-App
+
+Navigation mit Expo Router, Screens liegen in `apps/mobile/src/app`:
+
+| Screen | Datei | Login |
+| --- | --- | --- |
+| Karte mit Umkreis- und Kategorienfilter | `index.tsx` | nein |
+| Marktdetails mit Ständen | `market/[id].tsx` | nein |
+| Anmelden / Registrieren (Drei-Punkt-Menü) | `login.tsx` | – |
+| Stand eintragen | `stall/new.tsx` | Anbieter |
+| Meine Stände (Offen/Geschlossen) | `my-stalls.tsx` | Anbieter |
+| Markt vorschlagen | `suggest-market.tsx` | ja |
+
+Die Karte läuft in Expo Go ohne eigenen API-Schlüssel. Für eine eigene Android-Version braucht `react-native-maps` später einen Google-Maps-Schlüssel.
+
 Neue Pakete in der App immer mit `npx expo install <paket>` (im Ordner `apps/mobile`) hinzufügen.
 
 ## Datenbank
