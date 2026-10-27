@@ -21,6 +21,23 @@
     "web": {
       "favicon": "./assets/favicon.png"
     },
-    "scheme": "flohmarktradar"
+    "scheme": "flohmarktradar",
+    "plugins": [
+      "expo-router",
+      "@react-native-community/datetimepicker",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "FlohmarktRadar nutzt deinen Standort, um Flohmärkte in deiner Nähe zu zeigen."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "FlohmarktRadar braucht Zugriff auf deine Fotos für das Beweis-Foto deines Garagen- oder Hofflohmarkts.",
+          "cameraPermission": "FlohmarktRadar braucht die Kamera für das Beweis-Foto deines Garagen- oder Hofflohmarkts."
+        }
+      ]
+    ]
   }
 }
