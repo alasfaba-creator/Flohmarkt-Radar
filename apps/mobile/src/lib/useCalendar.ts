@@ -14,7 +14,10 @@ export type CalendarEntry = {
   endTime: string | null;
   distanceM: number;
   covered: CoverType | null;
+  latitude: number;
+  longitude: number;
   stallType?: StallType;
+  categories: string[];
 };
 
 type Center = { latitude: number; longitude: number };
@@ -48,6 +51,16 @@ export function useCalendar(center: Center | null, radiusKm: number) {
       return;
     }
 
+    // Kategorien eines Markts ergeben sich aus den freigegebenen Ständen, die dort eingetragen sind.
+    const allStalls = (stalls.data ?? []) as NearbyStall[];
+    const marketCategories = new Map<string, Set<string>>();
+    for (const { stall } of allStalls) {
+      if (!stall.market_id) continue;
+      const set = marketCategories.get(stall.market_id) ?? new Set<string>();
+      for (const c of stall.categories ?? []) set.add(c);
+      marketCategories.set(stall.market_id, set);
+    }
+
     const marketEntries: CalendarEntry[] = ((dates.data ?? []) as NearbyMarketDate[]).map(({ market_date, market, distance_m }) => ({
       key: `d-${market_date.id}`,
       date: market_date.event_date,
@@ -59,9 +72,12 @@ export function useCalendar(center: Center | null, radiusKm: number) {
       endTime: market_date.end_time,
       distanceM: distance_m,
       covered: market.is_covered as CoverType | null,
+      latitude: market.latitude,
+      longitude: market.longitude,
+      categories: [...(marketCategories.get(market.id) ?? [])],
     }));
 
-    const stallEntries: CalendarEntry[] = ((stalls.data ?? []) as NearbyStall[])
+    const stallEntries: CalendarEntry[] = allStalls
       .filter(({ stall }) => !stall.market_id && stall.event_date && stall.event_date >= fromDate && stall.event_date <= toDate)
       .map(({ stall, distance_m }) => ({
         key: `s-${stall.id}`,
@@ -75,6 +91,9 @@ export function useCalendar(center: Center | null, radiusKm: number) {
         distanceM: distance_m,
         covered: null,
         stallType: stall.stall_type as StallType,
+        latitude: stall.latitude,
+        longitude: stall.longitude,
+        categories: stall.categories ?? [],
       }));
 
     setEntries([...marketEntries, ...stallEntries].sort((a, b) => a.date.localeCompare(b.date) || a.distanceM - b.distanceM));

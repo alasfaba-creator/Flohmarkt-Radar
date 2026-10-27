@@ -16,7 +16,7 @@ export const COLORS = {
 export const CATEGORIES = [
   'Kleidung',
   'Kinderkleidung',
-  'Spielzeug',
+  'Spielzeug & Spiele',
   'Bücher',
   'Möbel',
   'Haushalt',

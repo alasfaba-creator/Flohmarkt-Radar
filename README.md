@@ -29,8 +29,8 @@ Navigation mit Expo Router, Screens liegen in `apps/mobile/src/app`:
 
 | Screen | Datei | Login |
 | --- | --- | --- |
-| Kalender „wann – wo – was“ (Startseite) | `(tabs)/index.tsx` | nein |
-| Karte mit Umkreis- und Kategorienfilter | `(tabs)/karte.tsx` | nein |
+| Liste „wann – wo – was“ (Startseite) | `(tabs)/index.tsx` | nein |
+| Karte mit denselben Filtern (Tag, Umkreis, Kategorie) | `(tabs)/karte.tsx` | nein |
 | Marktdetails mit Ständen | `market/[id].tsx` | nein |
 | Anmelden / Registrieren (Drei-Punkt-Menü) | `login.tsx` | – |
 | Stand eintragen | `stall/new.tsx` | Anbieter |
