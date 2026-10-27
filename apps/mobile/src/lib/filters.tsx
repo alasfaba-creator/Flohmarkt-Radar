@@ -37,9 +37,11 @@ export function FiltersProvider({ children }: { children: ReactNode }) {
     [all, category],
   );
   const eventDays = useMemo(() => [...new Set(byCategory.map((e) => e.date))], [byCategory]);
-  // Fällt der gewählte Tag durch einen anderen Filter weg, zurück auf „Alle“.
+  // Es ist immer ein Tag gewählt: anfangs der nächste Tag mit Flohmarkt, und wenn der gewählte Tag
+  // durch einen anderen Filter wegfällt, ebenfalls der nächste verfügbare.
   useEffect(() => {
-    if (selectedDay && !loading && !eventDays.includes(selectedDay)) setSelectedDay(null);
+    if (loading) return;
+    if (!selectedDay || !eventDays.includes(selectedDay)) setSelectedDay(eventDays[0] ?? null);
   }, [eventDays, selectedDay, loading]);
 
   const entries = useMemo(

@@ -38,9 +38,6 @@ export function FilterBar() {
       </ScrollView>
 
       <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.days}>
-        <Pressable style={[styles.day, !selectedDay && styles.daySelected]} onPress={() => setSelectedDay(null)}>
-          <Text style={[styles.dayAll, !selectedDay && styles.selectedText]}>Alle</Text>
-        </Pressable>
         {eventDays.map((iso) => {
           const d = parseDbDate(iso);
           const selected = selectedDay === iso;
@@ -48,7 +45,7 @@ export function FilterBar() {
             <Pressable
               key={iso}
               style={[styles.day, selected && styles.daySelected]}
-              onPress={() => setSelectedDay(selected ? null : iso)}
+              onPress={() => setSelectedDay(iso)}
               accessibilityLabel={formatDayHeading(iso)}
             >
               <Text style={[styles.weekday, selected && styles.selectedText]}>{WEEKDAYS_SHORT[d.getDay()]}</Text>
@@ -121,7 +118,6 @@ const styles = StyleSheet.create({
   day: { minWidth: 52, alignItems: 'center', justifyContent: 'center', paddingVertical: 6, marginHorizontal: 2, borderRadius: 10 },
   daySelected: { backgroundColor: COLORS.primary },
   selectedText: { color: '#fff' },
-  dayAll: { fontSize: 15, fontWeight: '600', color: COLORS.text },
   weekday: { fontSize: 12, color: COLORS.muted },
   dayNumber: { fontSize: 18, fontWeight: '700', color: COLORS.text },
   month: { fontSize: 11, color: COLORS.muted },
